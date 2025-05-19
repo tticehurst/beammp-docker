@@ -2,8 +2,6 @@ name: Docker Image Build
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '*/15 * * * *'
   repository_dispatch:
     types: [beammp_release]
 
