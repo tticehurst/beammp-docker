@@ -1,0 +1,34 @@
+name: Monitor BeamMP Releases
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+
+jobs:
+  check-beammp-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check latest release from BeamMP/BeamMP-Server
+        id: fetch
+        run: |
+          echo "LATEST_TAG=$(curl -s https://api.github.com/repos/BeamMP/BeamMP-Server/releases/latest | jq -r .tag_name)" >> "$GITHUB_OUTPUT"
+
+      - name: Compare with previously known tag
+        id: compare
+        run: |
+          echo "Found release tag: ${{ steps.fetch.outputs.LATEST_TAG }}"
+          echo "${{ steps.fetch.outputs.LATEST_TAG }}" > beammp_tag.txt
+        continue-on-error: false
+
+      - name: Store tag
+        uses: actions/cache@v4
+        with:
+          path: beammp_tag.txt
+          key: beammp-${{ steps.fetch.outputs.LATEST_TAG }}
+
+      - name: Trigger build with repository_dispatch
+        run: |
+          curl -X POST https://api.github.com/repos/${{ github.repository }}/dispatches \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"event_type":"beammp_release","client_payload":{"tag":"${{ steps.fetch.outputs.LATEST_TAG }}"}}'
