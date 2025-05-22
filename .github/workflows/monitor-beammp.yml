@@ -2,7 +2,7 @@ name: Monitor BeamMP Releases
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '0 * * * *'
 
 jobs:
   check-beammp-release:
