@@ -1,0 +1,14 @@
+
+name: beammp
+services:
+  beam:
+    container_name: beammp
+    image: ghcr.io/tticehurst/beammp-docker:latest
+    restart: unless-stopped
+    volumes:
+      - ./client-mods:/server/Resources/Client
+      - ./server-mods:/server/Resources/Server
+      - ./ServerConfig.toml:/server/ServerConfig.toml
+    ports:
+      - 30814:30814/tcp
+      - 30814:30814/udp
